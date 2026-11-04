@@ -1,0 +1,798 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cera + Blaise</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Sen:wght@400;500;700&display=swap">
+<style>
+/* Layout: Lani + Dylan house style. Full-bleed dark hero, then alternating warm off-white and near-black bands, one 840px column, thin rules, uppercase tracked eyebrows, Cormorant light headings with a short rule under each. */
+:root{
+  --paper:#F7F5F0; --paper-2:#F1EEE7; --ink:#141414; --ink-soft:#3A3734;
+  --text:#2B2926; --muted:#7A746C; --rose:#9C6B6E; --rose-soft:#C9A5A2; --wine:#6B2E34;
+  --hair:rgba(20,20,20,.12);
+  --bg:var(--paper); --fg:var(--text);
+  --dark-bg:#161616; --dark-fg:#D9D4CC; --dark-muted:#8E887F; --dark-hair:rgba(217,212,204,.14); --dark-card:rgba(255,255,255,.03);
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --body:"Sen","Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#1B1A18; --fg:#DDD7CE; --paper:#1B1A18; --paper-2:#211F1C; --text:#DDD7CE; --muted:#9A9289; --hair:rgba(221,215,206,.14); --rose:#C49A98; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#1B1A18; --fg:#DDD7CE; --paper:#1B1A18; --paper-2:#211F1C; --text:#DDD7CE; --muted:#9A9289; --hair:rgba(221,215,206,.14); --rose:#C49A98; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15.5px;line-height:1.7;font-weight:400}
+a{color:inherit}
+h1,h2,h3,h4{font-family:var(--display);font-weight:300;line-height:1.1;margin:0;text-wrap:balance}
+h2{font-size:clamp(2.4rem,5vw,3.4rem);color:var(--ink-soft)}
+h3{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:400}
+h4{font-family:var(--body);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--rose);font-weight:500;margin:2rem 0 .6rem}
+.dark h2{color:#CFC9BF}
+.eyebrow{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--rose);margin-bottom:1.4rem;font-weight:500}
+.dark .eyebrow{color:var(--rose-soft)}
+.rule{width:34px;height:1px;background:var(--rose);margin:1.4rem 0 2rem}
+.rule.c{margin-left:auto;margin-right:auto}
+.band{padding-block:7rem}
+.dark{background:var(--dark-bg);color:var(--dark-fg)}
+.dark .muted{color:var(--dark-muted)}
+.wrap{max-width:840px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.narrow{max-width:600px}
+p{margin:0 0 1.1rem}
+.muted{color:var(--muted)}
+.center{text-align:center}
+
+/* hero */
+.hero{position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;color:#EFEAE2;overflow:hidden;background:#0D0D0E}
+.hero canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero .in{position:relative;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:6rem}
+.hero .eyebrow{color:#B9A99A;margin-bottom:1.2rem}
+.hero h1{font-size:clamp(3.4rem,9vw,6.4rem);color:#F4EFE7;letter-spacing:.01em}
+.hero .sub{font-family:var(--display);font-style:italic;font-size:clamp(1.3rem,2.4vw,1.75rem);font-weight:300;margin:1.4rem 0 2.4rem;color:#DDD5CA}
+.hero .meta{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:#A89C8E;display:flex;gap:2.2rem;justify-content:center;flex-wrap:wrap}
+
+/* dash lists */
+.dash{list-style:none;padding:0;margin:0}
+.dash li{display:grid;grid-template-columns:1.2rem 1fr;gap:.4rem;padding:.9rem 0;border-bottom:1px solid var(--hair);margin:0}
+.dash li::before{content:"";width:9px;height:1px;background:var(--rose);margin-top:.85em}
+.dark .dash li{border-color:var(--dark-hair)}
+.dark .dash li::before{background:var(--rose-soft)}
+.why{list-style:none;padding:0;margin:0}
+.why li{padding:.8rem 0;border-bottom:1px solid var(--hair);margin:0}
+.dark .why li{border-color:var(--dark-hair)}
+
+/* track cards */
+.tracks{display:grid;gap:1.6rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:3rem}
+.track{border:1px solid var(--dark-hair);padding:2rem 1.9rem;min-width:0;background:var(--dark-card)}
+.track.rec{border-color:rgba(201,165,162,.55)}
+.pill{display:inline-block;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;padding:.45em .9em;background:rgba(255,255,255,.07);color:var(--rose-soft);margin-bottom:1.2rem}
+.pill.on{background:var(--wine);color:#F2E6E4}
+.track h3{font-size:1.7rem;margin-bottom:.4rem}
+.track .rule{margin:1rem 0 1.2rem}
+.track p{font-size:.93rem;color:var(--dark-fg)}
+
+/* day ledger */
+.days{list-style:none;padding:0;margin:0}
+.days li{display:grid;grid-template-columns:8rem 1fr;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--hair);margin:0}
+.dark .days li{border-color:var(--dark-hair)}
+.days .d{font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);padding-top:.45em;font-variant-numeric:tabular-nums}
+.dark .days .d{color:var(--rose-soft)}
+.days .d small{display:block;letter-spacing:.08em;color:var(--muted);text-transform:none;margin-top:.2em}
+.dark .days .d small{color:var(--dark-muted)}
+.days .w{font-family:var(--display);font-size:1.35rem;font-weight:400;display:block}
+.days .t{min-width:0}
+.days .t p{margin:.2em 0 0;font-size:.93rem}
+@media (max-width:560px){.days li{grid-template-columns:1fr;gap:.2rem}}
+
+/* stat row */
+.stats{display:flex;flex-wrap:wrap;gap:1.6rem 2.6rem;padding-top:1.6rem;border-top:1px solid var(--hair);margin-top:2.4rem}
+.dark .stats{border-color:var(--dark-hair)}
+.stat{min-width:0}
+.stat .k{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.35em}
+.dark .stat .k{color:var(--dark-muted)}
+.links{display:flex;flex-wrap:wrap;gap:1.6rem;margin-top:1.8rem}
+.links a{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;text-decoration:none;color:var(--rose);border-bottom:1px solid var(--rose);padding-bottom:.35em}
+.dark .links a{color:var(--rose-soft);border-color:var(--rose-soft)}
+
+/* rec label */
+.reclabel{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:3rem 0 1.4rem}
+.reclabel .pill{margin:0;background:rgba(156,107,110,.14);color:var(--wine)}
+.dark .reclabel .pill{background:rgba(255,255,255,.07);color:var(--rose-soft)}
+.reclabel span.loc{font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)}
+
+/* answered list */
+.ans{list-style:none;padding:0;margin:0}
+.ans li{padding:1.3rem 0;border-bottom:1px solid var(--hair);margin:0}
+.ans .q{font-family:var(--display);font-size:1.45rem;font-weight:400;display:flex;gap:1rem;align-items:baseline;flex-wrap:wrap}
+.ans .v{font-family:var(--body);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;padding:.35em .7em;color:var(--wine);background:rgba(156,107,110,.14)}
+.ans .v.cut{color:var(--muted);background:rgba(20,20,20,.06)}
+.dark .ans .v{color:#E3C4C1;background:rgba(201,165,162,.18)}
+.dark .ans .v.cut{color:var(--dark-fg);background:rgba(255,255,255,.08)}
+.dark .ans a{color:var(--rose-soft)}
+.ans p{margin:.5rem 0 0;font-size:.95rem}
+.ans a{color:var(--wine);text-decoration-thickness:1px;text-underline-offset:3px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .ans a{color:var(--rose)} :root:not([data-theme="light"]) .ans .v.cut{background:rgba(221,215,206,.08)}}
+:root[data-theme="dark"] .ans a{color:var(--rose)} :root[data-theme="dark"] .ans .v.cut{background:rgba(221,215,206,.08)}
+
+/* fee box and table */
+.feebox{border:1px solid var(--hair);background:var(--paper-2);text-align:center;padding:3rem 1.5rem;margin:2.4rem 0}
+.feebox .k{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--rose);display:block;margin-bottom:1rem}
+.feebox .fee{font-family:var(--display);font-size:clamp(2.6rem,6vw,4rem);font-weight:300;color:var(--wine);line-height:1}
+.feebox .s{font-size:.8rem;color:var(--muted);margin-top:1.4rem}
+.feebox .split{display:flex;justify-content:center;gap:3rem;flex-wrap:wrap;margin-top:1.6rem;font-family:var(--display);font-size:1.5rem;color:var(--ink-soft)}
+.feebox .split .k{margin-bottom:.3rem}
+.dark .feebox .split{color:var(--dark-fg)}
+.callout{border-left:2px solid var(--wine);padding-left:1.4rem;margin-top:2.4rem}
+.callout p{font-size:.95rem}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+td{padding:.85rem .4rem;border-bottom:1px solid var(--hair);vertical-align:top}
+td:first-child{font-weight:500}
+td:last-child{text-align:right;white-space:nowrap;color:var(--muted)}
+.dark td{border-color:var(--dark-hair)}
+.dark td:last-child{color:var(--dark-muted)}
+
+/* steps */
+.steps{display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:3rem;text-align:center}
+.steps .n{font-family:var(--display);font-size:1.6rem;color:var(--rose-soft);font-weight:300}
+.steps .h{font-family:var(--display);font-size:1.35rem;margin:.4rem 0 .5rem}
+.steps p{font-size:.85rem;color:var(--dark-muted);margin:0}
+
+/* closer */
+.closer{background:var(--wine);color:#F2E6E4;text-align:center;padding-block:7rem}
+.closer h2{color:#F7EDEA;font-size:clamp(2.4rem,5vw,3.4rem);max-width:14ch;margin:0 auto 1.6rem}
+.closer p{max-width:58ch;margin:0 auto 1rem;font-size:.95rem;color:#E9D9D6}
+.closer .sig{font-family:var(--display);font-size:1.4rem;margin-top:3rem;color:#F7EDEA}
+.closer .v{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:#D7B9B5;margin-top:2.6rem}
+
+
+/* image slots: each has data-slot for wiring; placeholder tint until an <img> is dropped in */
+.ph{background:linear-gradient(135deg,var(--paper-2),var(--cream-2,#E6E0D4));border:1px solid var(--hair);aspect-ratio:3/2;display:grid;place-items:center;overflow:hidden;position:relative;margin:0}
+.dark .ph{background:linear-gradient(135deg,#1F1D1A,#2A2724);border-color:var(--dark-hair)}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.ph .cap{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);text-align:center;padding:1rem;max-width:26ch}
+.dark .ph .cap{color:var(--dark-muted)}
+.ph.tall{aspect-ratio:4/5}
+.ph.wide{aspect-ratio:21/9}
+.gal{display:grid;gap:1.2rem;grid-template-columns:repeat(2,1fr);margin-top:2.4rem}
+.gal.three{grid-template-columns:repeat(3,1fr)}
+.gal.one{grid-template-columns:1fr}
+@media (max-width:640px){.gal,.gal.three{grid-template-columns:1fr}}
+/* .big galleries break out of the text column to a wider centred frame */
+.gal.big{width:min(1100px,calc(100vw - 32px));margin-left:calc(50% - min(550px,50vw - 16px));margin-top:3rem}
+.credits{font-size:.68rem;color:var(--muted);margin-top:.8rem;line-height:1.5}
+.dark .credits{color:var(--dark-muted)}
+/* route maps: inline svg, themed by the band it sits on */
+.routemap{aspect-ratio:4/3;border:1px solid var(--hair);background:var(--paper);margin:0 0 2.4rem;overflow:hidden}
+.routemap svg{display:block;width:100%;height:100%}
+.routemap .land{fill:var(--paper-2);stroke:var(--hair);stroke-width:1}
+.routemap .leg{fill:none;stroke:var(--rose);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.routemap .leg.rail{stroke-dasharray:7 6}
+.routemap .spur{fill:none;stroke:var(--rose);stroke-width:1.2;stroke-dasharray:2 4;stroke-linecap:round;opacity:.85}
+.routemap .stop{fill:var(--rose)}
+.routemap .stop.wed{fill:var(--wine)}
+.routemap .ring{fill:none;stroke:var(--wine);stroke-width:1}
+.routemap .pass{fill:var(--paper);stroke:var(--rose);stroke-width:1.6}
+.routemap .num{fill:#fff;font-family:var(--body);font-size:11px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+.routemap .lbl{fill:var(--fg);opacity:.8;font-family:var(--body);font-size:15px;letter-spacing:.12em;text-transform:uppercase;paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round}
+.routemap .lbl.sm{font-size:12px;opacity:.7}
+.routemap .lbl.wed{fill:var(--wine);opacity:1;font-weight:700}
+.routemap .cap2{fill:var(--muted);font-family:var(--body);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.dark .routemap{border-color:var(--dark-hair);background:var(--dark-bg)}
+.dark .routemap .land{fill:rgba(255,255,255,.05);stroke:var(--dark-hair)}
+.dark .routemap .leg,.dark .routemap .spur{stroke:var(--rose-soft)}
+.dark .routemap .stop{fill:var(--rose-soft)}
+.dark .routemap .stop.wed{fill:#EAD2CE}
+.dark .routemap .ring{stroke:#EAD2CE}
+.dark .routemap .pass{fill:var(--dark-bg);stroke:var(--rose-soft)}
+.dark .routemap .num{fill:var(--dark-bg)}
+.dark .routemap .lbl{fill:var(--dark-fg);stroke:var(--dark-bg)}
+.dark .routemap .lbl.wed{fill:#E3C4C1}
+.dark .routemap .cap2{fill:var(--dark-muted)}
+/* two side-by-side lists, stacked on phones */
+.cols2{display:grid;gap:2.4rem 3rem;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:3rem}
+.cols2 h3{font-size:1.7rem}
+@media (max-width:640px){.cols2{grid-template-columns:1fr}}
+/* look and feel */
+.lf{display:grid;gap:2rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-top:2.6rem}
+.lf h3{font-size:1.3rem}
+.lf .rule{margin:.8rem 0 1rem}
+.lf p{font-size:.9rem;color:var(--muted);margin:0}
+.sw{display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:3rem}
+.sw .c{height:130px}
+.sw .n{font-family:var(--display);font-size:1.15rem;margin-top:.8rem}
+.sw .x{font-size:.62rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase}
+.sw .d{font-size:.8rem;color:var(--muted);margin-top:.4rem;padding-right:.6rem}
+@media (max-width:760px){.sw{grid-template-columns:repeat(3,1fr);gap:1rem 0}}
+@media (max-width:420px){.sw{grid-template-columns:repeat(2,1fr)}}
+/* hero photo */
+/* split hero: text left, photo right; stacks with the photo on top on phones */
+.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr);place-items:stretch;text-align:left;min-height:100vh}
+.hero .in{align-self:center;padding-block:6rem;padding-left:clamp(1.5rem,6vw,6rem);padding-right:clamp(1.5rem,3vw,3rem)}
+.hero h1{font-size:clamp(3rem,6vw,5.4rem)}
+.hero .meta{justify-content:flex-start;gap:.8rem 2.2rem}
+.hero-photo{position:relative;min-height:100%}
+.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block}
+.hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(to right,#0D0D0E,rgba(13,13,14,0) 22%)}
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr;min-height:0}
+  .hero-photo{order:-1;height:62vh;min-height:320px}
+  .hero-photo::after{background:linear-gradient(to top,#0D0D0E,rgba(13,13,14,0) 30%)}
+  .hero .in{padding:2.5rem 1.5rem 4rem}
+}
+.fade{transition:opacity .9s ease,transform .9s ease}
+.js .fade.pre{opacity:.001;transform:translateY(16px)}
+@media (prefers-reduced-motion:reduce){.fade{transition:none}.js .fade.pre{opacity:1;transform:none}}
+:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+</style>
+
+<header class="hero" data-slot="hero">
+  <div class="in">
+    <div class="eyebrow">Married in Japan</div>
+    <h1>Cera &amp; Blaise</h1>
+    <p class="sub">A Shinto wedding, a dragon's lake, and two weeks across Japan.</p>
+    <div class="meta"><span>May 2027</span><span>Ten at the shrine</span><span>Three on the road</span></div>
+  </div>
+  <div class="hero-photo"><img src="images/hero.jpg" alt="Mt. Fuji at dusk over Lake Kawaguchi"></div>
+</header>
+
+<section class="band">
+  <div class="wrap narrow fade">
+    <div class="eyebrow">Your vision</div>
+    <h2>What we heard.</h2>
+    <div class="rule"></div>
+    <ul class="dash">
+      <li>Two weeks, May 2 to May 17, 2027, built around MagicCon Tokyo on May 14 to 16.</li>
+      <li>Around 10 of you at the wedding: Cera, Blaise, Jackson (10), Cera's sister and her partner, Felix, Tyler, and the store manager who earned the trip. The two-week itinerary is for the three of you. The rest join for Kyoto and MagicCon on their own plans.</li>
+      <li>A traditional Shinto ceremony on a weekday. Mt. Fuji is the picture you have in your heads. A red torii gate or any beautiful natural setting is your stated fallback.</li>
+      <li>The sake ritual done with a non-alcoholic cup, without comment or fuss.</li>
+      <li>A white kimono with dragons that Cera buys, keeps, and shadow-boxes at home. Black hakama for Blaise with red inside. No yellow anywhere. Jackson fully in kimono.</li>
+      <li>Small ryokans and independent hotels. No Airbnbs, no chains.</li>
+      <li>A new region every two or three days. Off the beaten path. Hands-on wherever possible, and the real Japanese version of things rather than the Americanized one.</li>
+      <li>A 4 to 5 hour custom Japanese dragon tattoo in Tokyo, and an onsen before it.</li>
+      <li>This is a first draft. We refine it together on every call from here.</li>
+    </ul>
+    <div class="gal three big">
+      <figure class="ph" data-slot="brief-1"><img src="images/brief-fuji.jpg" alt="Mt. Fuji over Lake Kawaguchi" loading="lazy"></figure>
+      <figure class="ph" data-slot="brief-2"><img src="images/brief-dragoneye.jpg" alt="The Dragon Eye at Kagami-numa, Hachimantai" loading="lazy"></figure>
+      <figure class="ph" data-slot="brief-3"><img src="images/brief-fushimi.jpg" alt="Torii path at Fushimi Inari" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade">
+    <div class="narrow" style="margin:0">
+      <div class="eyebrow">The decision</div>
+      <h2>Two ways to do this.</h2>
+      <div class="rule"></div>
+      <p>Both routes start in the north and end in Tokyo, so you move in one direction and never double back. Both put the dragon's lake on May 3, the one stretch when Tokyo is best avoided anyway (Golden Week holidays run May 3 to 5).</p>
+      <p>The difference is where the ceremony happens. Route A holds it in Kyoto and uses Fuji for your portraits. Route B holds it at Fuji. We recommend Route A, and the reasons are under each route. Read both, tell us which one is yours, and we start building it.</p>
+    </div>
+
+    <div class="tracks">
+      <div class="track rec">
+        <span class="pill on">Route A · Recommended</span>
+        <h3>Ceremony in Kyoto, portraits at Fuji</h3>
+        <div class="rule"></div>
+        <p>The wedding at Yoshida Shrine, a 1,000-year-old shrine on a wooded hill in Kyoto, with a team we have run this ceremony with before. Fuji comes two days later, in kimono, with two mornings of chances for the photo and nothing riding on the weather. One line south, no backtracking. May 10 is a Monday, inside your window.</p>
+      </div>
+      <div class="track">
+        <span class="pill">Route B · Alternative</span>
+        <h3>Ceremony at Fuji</h3>
+        <div class="rule"></div>
+        <p>The wedding at Kitaguchi Hongu Fuji Sengen Shrine at the foot of the mountain, on Thursday May 6. The picture you first described, held in one place on one day of mountain weather. Early May visibility is close to a coin flip, the route passes through Tokyo twice, and it would be our first ceremony with this shrine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap fade">
+    <div class="eyebrow">Route A</div>
+    <h2>Kyoto, then Fuji.</h2>
+    <div class="rule"></div>
+    <figure class="routemap" data-slot="map-A">
+<svg viewBox="0 0 800 600" role="img" aria-label="Route A: arrive at Akita, Lake Tazawa and the Dragon Eye, Morioka, shinkansen past Tokyo to Nagoya and Gujo-Hachiman, the wedding in Kyoto, then Fuji and Tokyo, in one line south with no backtracking." xmlns="http://www.w3.org/2000/svg">
+<path class="land" d="M656.1 38.9 L668.2 36.8 L665.2 57.6 L666.9 82.7 L668.6 90.3 L686.5 111.8 L696.8 145.5 L696.1 170.0 L692.0 191.4 L679.1 200.6 L673.1 214.9 L668.8 239.0 L649.6 243.5 L641.8 256.3 L640.0 269.7 L645.8 302.2 L643.9 326.0 L642.1 333.6 L629.4 351.8 L621.0 385.5 L623.6 397.1 L637.1 419.7 L624.5 424.0 L614.8 434.1 L612.6 450.5 L609.3 456.3 L593.5 466.0 L586.1 475.3 L582.0 474.3 L579.6 471.4 L582.0 467.9 L581.1 448.5 L595.5 429.1 L589.7 423.5 L581.5 424.2 L577.9 435.2 L571.6 441.0 L572.5 447.0 L576.7 451.5 L573.0 458.5 L562.2 448.4 L550.2 449.8 L544.0 458.1 L541.5 479.4 L535.9 488.9 L528.2 494.2 L524.1 488.8 L526.3 470.2 L531.7 466.8 L521.9 460.2 L514.3 462.7 L496.9 486.6 L493.5 495.8 L459.0 491.2 L433.2 496.7 L445.3 488.5 L444.6 483.9 L431.6 484.3 L427.9 479.7 L426.9 487.3 L423.0 486.5 L422.0 470.0 L424.4 466.1 L419.4 465.1 L413.3 469.6 L404.9 490.2 L423.5 506.7 L422.1 514.1 L394.1 524.0 L371.9 565.5 L360.1 570.5 L347.1 566.1 L329.8 535.5 L328.3 516.5 L339.5 507.9 L345.2 494.3 L341.9 491.8 L325.2 493.4 L309.0 484.4 L282.6 487.8 L267.7 500.4 L239.8 506.8 L223.6 515.6 L217.0 513.7 L197.6 519.4 L185.0 512.1 L179.2 514.0 L175.2 520.7 L170.3 546.8 L148.6 532.4 L121.4 539.5 L112.8 534.6 L104.7 537.6 L103.1 518.3 L109.2 509.5 L127.9 508.1 L176.4 467.0 L199.8 440.3 L211.8 434.1 L230.3 431.0 L236.1 437.6 L248.9 434.1 L268.4 434.3 L332.3 418.2 L337.1 419.9 L335.3 428.6 L340.4 433.1 L359.3 434.6 L371.2 427.6 L381.5 416.8 L376.7 401.8 L380.0 393.2 L395.6 376.7 L413.8 351.1 L416.5 337.0 L414.9 320.3 L421.5 307.9 L447.2 298.5 L447.9 304.2 L438.0 314.6 L425.8 322.1 L424.5 325.8 L429.6 331.9 L430.8 344.7 L443.1 350.3 L448.2 349.2 L457.4 337.0 L500.5 319.0 L517.2 301.9 L530.7 276.8 L556.3 259.6 L564.7 232.4 L579.8 206.9 L585.7 183.5 L592.3 171.2 L593.8 156.8 L590.1 141.2 L576.5 136.8 L585.4 130.0 L590.9 113.9 L586.3 95.5 L588.6 86.1 L605.4 74.4 L608.7 63.7 L607.2 53.2 L611.0 48.6 L623.9 50.9 L626.7 71.2 L630.4 75.5 L640.4 68.0 L650.2 72.0 L655.9 64.8 L656.9 50.2 L654.6 47.6 L633.2 54.7 L633.2 46.9 L640.5 30.0Z"/>
+<path class="spur" d="M626.0 150.0 Q631.0 142.3 636.0 134.6"/>
+<path class="spur" d="M427.6 418.1 Q426.6 426.6 425.5 435.1"/>
+<path class="spur" d="M427.6 418.1 Q431.2 437.4 434.7 456.8"/>
+<path class="spur" d="M364.0 467.8 Q373.7 475.9 383.4 484.1"/>
+<path class="leg car" d="M602.0 157.4 Q612.9 150.1 626.0 150.0"/>
+<path class="leg car" d="M626.0 150.0 Q639.2 146.8 652.0 151.4"/>
+<path class="leg rail" d="M652.0 151.4 C649.6 167.7 648.7 213.4 637.5 248.8 C626.3 284.1 596.1 337.0 584.9 363.4 C573.7 389.9 571.4 397.6 570.2 407.5 C569.1 417.3 576.6 420.1 577.9 422.6"/>
+<path class="leg rail" d="M577.9 422.6 C572.4 426.3 552.5 439.3 544.9 444.7 C537.3 450.1 538.9 451.9 532.1 455.0 C525.3 458.2 514.8 459.3 504.2 463.5 C493.7 467.8 477.9 477.8 468.9 480.4 C459.9 483.0 457.8 482.9 450.2 479.0 C442.7 475.1 428.0 460.7 423.6 457.0"/>
+<path class="leg car" d="M423.6 457.0 Q419.8 436.9 427.6 418.1"/>
+<path class="leg rail" d="M427.6 418.1 C425.9 420.9 422.9 431.1 416.9 435.0 C410.9 438.8 400.7 435.9 391.9 441.4 C383.1 446.8 368.7 463.4 364.0 467.8"/>
+<path class="leg rail" d="M364.0 467.8 C368.7 464.4 383.7 450.8 391.9 447.4 C400.1 443.9 407.8 445.6 413.1 447.2 C418.4 448.8 417.4 450.9 423.6 457.0 C429.7 463.2 442.7 479.3 450.2 484.0 C457.8 488.8 459.9 488.0 468.9 485.4 C477.9 482.8 493.7 472.8 504.2 468.5 C514.8 464.3 528.9 465.9 532.1 460.0 C535.3 454.2 525.0 438.1 523.5 433.7"/>
+<path class="leg rail" d="M523.5 433.7 Q551.4 440.8 578.6 431.5"/>
+<circle class="stop" cx="636.0" cy="134.6" r="3.5"/>
+<circle class="stop" cx="425.5" cy="435.1" r="3.5"/>
+<circle class="stop" cx="434.7" cy="456.8" r="3.5"/>
+<circle class="stop" cx="383.4" cy="484.1" r="3.5"/>
+<circle class="pass" cx="423.6" cy="457.0" r="4.5"/>
+<circle class="stop" cx="602.0" cy="157.4" r="9"/>
+<text class="num" x="602.0" y="157.4">1</text>
+<circle class="stop" cx="626.0" cy="150.0" r="9"/>
+<text class="num" x="626.0" y="150.0">2</text>
+<circle class="stop" cx="652.0" cy="151.4" r="9"/>
+<text class="num" x="652.0" y="151.4">3</text>
+<circle class="stop" cx="427.6" cy="418.1" r="9"/>
+<text class="num" x="427.6" y="418.1">4</text>
+<circle class="ring" cx="364.0" cy="467.8" r="27"/>
+<circle class="stop wed" cx="364.0" cy="467.8" r="13.5"/>
+<text class="num" x="364.0" y="467.8" style="font-size:14px">5</text>
+<circle class="stop" cx="523.5" cy="433.7" r="9"/>
+<text class="num" x="523.5" y="433.7">6</text>
+<circle class="stop" cx="578.6" cy="431.5" r="9"/>
+<text class="num" x="578.6" y="431.5">7</text>
+<text class="lbl" x="588.0" y="162.4" text-anchor="end">Akita</text>
+<text class="lbl" x="610.0" y="132.0" text-anchor="end">Lake Tazawa</text>
+<text class="lbl" x="667.0" y="156.4" text-anchor="start">Morioka</text>
+<text class="lbl" x="415.6" y="406.1" text-anchor="end">Gujo-Hachiman</text>
+<text class="lbl wed" x="344.0" y="472.8" text-anchor="end">Kyoto</text>
+<text class="lbl" x="535.5" y="457.7" text-anchor="start">Fuji</text>
+<text class="lbl" x="594.6" y="441.5" text-anchor="start">Tokyo</text>
+<text class="lbl sm" x="640.0" y="120.6" text-anchor="start">Dragon Eye</text>
+<text class="lbl sm" x="416.5" y="447.1" text-anchor="end">Seki</text>
+<path class="spur" style="stroke-dasharray:none;stroke-width:.8" d="M436.7 461.8 L452.7 504.8"/>
+<text class="lbl sm" x="454.7" y="516.8" text-anchor="start">Ghibli Park</text>
+<text class="lbl sm" x="383.4" y="506.1" text-anchor="middle">Iga</text>
+<g transform="translate(600 528)"><path class="leg" d="M0 0 H34"/><text class="cap2" x="44" y="4">By car</text><path class="leg rail" d="M0 22 H34"/><text class="cap2" x="44" y="26">By train</text><path class="spur" d="M0 44 H34"/><text class="cap2" x="44" y="48">Day trip</text></g>
+<text class="cap2" x="24" y="580">Route A · One line south · Wedding in Kyoto, May 10</text>
+</svg>
+</figure>
+    <ol class="days">
+      <li><span class="d">Sun May 2<small>Arrive</small></span><span class="t"><span class="w">Land in the north</span><p>Into Haneda and straight on to Akita, or into Sendai via Seoul. Car to a ryokan at Lake Tazawa. First onsen, early night.</p></span></li>
+      <li><span class="d">Mon May 3<small>Golden Week</small></span><span class="t"><span class="w">The dragon's lake</span><p>The Hachimantai snow corridor, then the walk up to Kagami-numa, the Dragon Eye. Lake Tazawa and the Tatsuko dragon legend in the afternoon. Fill the bottle.</p></span></li>
+      <li><span class="d">Tue May 4<small>Golden Week</small></span><span class="t"><span class="w">Spare day for weather</span><p>Second try at the summit if May 3 was clouded. Otherwise the samurai district at Kakunodate and an evening at Nyuto Onsen.</p></span></li>
+      <li><span class="d">Wed May 5</span><span class="t"><span class="w">South to the water town</span><p>Shinkansen Morioka to Nagoya, car to Gujo-Hachiman. Evening walk along the canals with the koi.</p></span></li>
+      <li><span class="d">Thu May 6</span><span class="t"><span class="w">Gujo and Seki</span><p>Morning workshop in Gujo. Afternoon in Seki, the sword town, beside a swordsmith's forge.</p></span></li>
+      <li><span class="d">Fri May 7</span><span class="t"><span class="w">Ghibli day</span><p>Ghibli Park, the full day. Candle painting in Okazaki on the way back if there is energy left.</p></span></li>
+      <li><span class="d">Sat May 8</span><span class="t"><span class="w">To Kyoto</span><p>Train to Kyoto. Final kimono fitting with our Kyoto attire team.</p></span></li>
+      <li><span class="d">Sun May 9</span><span class="t"><span class="w">Torii gates and Sentai</span><p>Fushimi Inari at dawn, before the crowds. Toei Kyoto Studio Park in the afternoon: the Super Sentai history exhibit, the hero show, the shuriken dojo.</p></span></li>
+      <li><span class="d">Mon May 10<small>Wedding</small></span><span class="t"><span class="w">The ceremony at Yoshida Shrine</span><p>Shinto ceremony, non-alcoholic san-san-kudo, Jackson in hakama. Portraits at the shrine torii. Ryotei dinner after.</p></span></li>
+      <li><span class="d">Tue May 11</span><span class="t"><span class="w">Ninja day in Iga</span><p>Day trip to Iga for Blaise's ninjutsu training. Evening train toward Fuji, car to Kawaguchiko. Ryokan with private open-air baths.</p></span></li>
+      <li><span class="d">Wed May 12</span><span class="t"><span class="w">Fuji portraits</span><p>Dawn in kimono at Arakura Sengen, the red pagoda shot, then the lake. Afternoon free. Last onsen of the trip.</p></span></li>
+      <li><span class="d">Thu May 13</span><span class="t"><span class="w">Tokyo and the tattoo</span><p>Second Fuji morning if May 12 was clouded. Train to Tokyo by midday. Tattoo session in the afternoon.</p></span></li>
+      <li><span class="d">May 14 to 16</span><span class="t"><span class="w">MagicCon Tokyo</span></span></li>
+      <li><span class="d">Mon May 17</span><span class="t"><span class="w">Fly home from Haneda</span></span></li>
+    </ol>
+    <div class="gal">
+      <figure class="ph" data-slot="routeA-1"><img src="images/seki-forge.webp" alt="Swordsmiths forging a blade, sparks flying, in Seki" loading="lazy"></figure>
+      <figure class="ph" data-slot="routeA-2"><img src="images/ghibli-totoro.jpg" alt="The Totoro lookout at Ghibli Park" loading="lazy"></figure>
+      <figure class="ph" data-slot="routeA-3"><img src="images/fushimi-gate.jpg" alt="The great torii and tower gate at Fushimi Inari, Kyoto" loading="lazy"></figure>
+      <figure class="ph" data-slot="routeA-4"><img src="images/fuji-couple.jpg" alt="A couple in wedding kimono by the lake below Mt. Fuji" loading="lazy" style="object-position:center 35%"></figure>
+    </div>
+
+    <h4>Why this works</h4>
+    <ul class="why">
+      <li>You asked for a weekday Shinto ceremony between May 4 and 10. May 10 is a Monday, and the shrine, the attire team and the dressing are a format we have run before.</li>
+      <li>You asked for Fuji. In this route Fuji is a photograph rather than a venue, so a cloudy morning costs you a retake, not the wedding.</li>
+      <li>You asked to move region to region. This goes Tohoku, Gifu, Kyoto, Fuji, Tokyo, in a straight line, with no day spent going back the way you came.</li>
+      <li>You asked for an onsen before the tattoo. There are three, and the last one is the night before.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade">
+    <div class="eyebrow">Route B</div>
+    <h2>Fuji first.</h2>
+    <div class="rule"></div>
+    <figure class="routemap" data-slot="map-B">
+<svg viewBox="0 0 800 600" role="img" aria-label="Route B: arrive at Akita, Lake Tazawa and the Dragon Eye, Morioka, shinkansen to Tokyo, the wedding at Fuji, then west to Gujo-Hachiman and Kyoto, and back east past Fuji to Tokyo." xmlns="http://www.w3.org/2000/svg">
+<path class="land" d="M656.1 38.9 L668.2 36.8 L665.2 57.6 L666.9 82.7 L668.6 90.3 L686.5 111.8 L696.8 145.5 L696.1 170.0 L692.0 191.4 L679.1 200.6 L673.1 214.9 L668.8 239.0 L649.6 243.5 L641.8 256.3 L640.0 269.7 L645.8 302.2 L643.9 326.0 L642.1 333.6 L629.4 351.8 L621.0 385.5 L623.6 397.1 L637.1 419.7 L624.5 424.0 L614.8 434.1 L612.6 450.5 L609.3 456.3 L593.5 466.0 L586.1 475.3 L582.0 474.3 L579.6 471.4 L582.0 467.9 L581.1 448.5 L595.5 429.1 L589.7 423.5 L581.5 424.2 L577.9 435.2 L571.6 441.0 L572.5 447.0 L576.7 451.5 L573.0 458.5 L562.2 448.4 L550.2 449.8 L544.0 458.1 L541.5 479.4 L535.9 488.9 L528.2 494.2 L524.1 488.8 L526.3 470.2 L531.7 466.8 L521.9 460.2 L514.3 462.7 L496.9 486.6 L493.5 495.8 L459.0 491.2 L433.2 496.7 L445.3 488.5 L444.6 483.9 L431.6 484.3 L427.9 479.7 L426.9 487.3 L423.0 486.5 L422.0 470.0 L424.4 466.1 L419.4 465.1 L413.3 469.6 L404.9 490.2 L423.5 506.7 L422.1 514.1 L394.1 524.0 L371.9 565.5 L360.1 570.5 L347.1 566.1 L329.8 535.5 L328.3 516.5 L339.5 507.9 L345.2 494.3 L341.9 491.8 L325.2 493.4 L309.0 484.4 L282.6 487.8 L267.7 500.4 L239.8 506.8 L223.6 515.6 L217.0 513.7 L197.6 519.4 L185.0 512.1 L179.2 514.0 L175.2 520.7 L170.3 546.8 L148.6 532.4 L121.4 539.5 L112.8 534.6 L104.7 537.6 L103.1 518.3 L109.2 509.5 L127.9 508.1 L176.4 467.0 L199.8 440.3 L211.8 434.1 L230.3 431.0 L236.1 437.6 L248.9 434.1 L268.4 434.3 L332.3 418.2 L337.1 419.9 L335.3 428.6 L340.4 433.1 L359.3 434.6 L371.2 427.6 L381.5 416.8 L376.7 401.8 L380.0 393.2 L395.6 376.7 L413.8 351.1 L416.5 337.0 L414.9 320.3 L421.5 307.9 L447.2 298.5 L447.9 304.2 L438.0 314.6 L425.8 322.1 L424.5 325.8 L429.6 331.9 L430.8 344.7 L443.1 350.3 L448.2 349.2 L457.4 337.0 L500.5 319.0 L517.2 301.9 L530.7 276.8 L556.3 259.6 L564.7 232.4 L579.8 206.9 L585.7 183.5 L592.3 171.2 L593.8 156.8 L590.1 141.2 L576.5 136.8 L585.4 130.0 L590.9 113.9 L586.3 95.5 L588.6 86.1 L605.4 74.4 L608.7 63.7 L607.2 53.2 L611.0 48.6 L623.9 50.9 L626.7 71.2 L630.4 75.5 L640.4 68.0 L650.2 72.0 L655.9 64.8 L656.9 50.2 L654.6 47.6 L633.2 54.7 L633.2 46.9 L640.5 30.0Z"/>
+<path class="spur" d="M626.0 150.0 Q631.0 142.3 636.0 134.6"/>
+<path class="spur" d="M427.6 418.1 Q426.6 426.6 425.5 435.1"/>
+<path class="spur" d="M427.6 418.1 Q431.2 437.4 434.7 456.8"/>
+<path class="spur" d="M364.0 467.8 Q373.7 475.9 383.4 484.1"/>
+<path class="leg car" d="M602.0 157.4 Q612.9 150.1 626.0 150.0"/>
+<path class="leg car" d="M626.0 150.0 Q639.2 146.8 652.0 151.4"/>
+<path class="leg rail" d="M652.0 151.4 C649.6 167.7 648.7 213.4 637.5 248.8 C626.3 284.1 596.1 337.0 584.9 363.4 C573.7 389.9 571.4 397.6 570.2 407.5 C569.1 417.3 576.6 420.1 577.9 422.6"/>
+<path class="leg rail" d="M577.9 422.6 Q548.0 414.6 523.5 433.7"/>
+<path class="leg rail" d="M523.5 433.7 C525.0 438.1 535.3 454.2 532.1 460.0 C528.9 465.9 514.8 464.3 504.2 468.5 C493.7 472.8 477.9 482.8 468.9 485.4 C459.9 488.0 457.8 488.8 450.2 484.0 C442.7 479.3 428.0 461.5 423.6 457.0"/>
+<path class="leg car" d="M423.6 457.0 Q419.8 436.9 427.6 418.1"/>
+<path class="leg rail" d="M427.6 418.1 Q388.4 433.4 364.0 467.8"/>
+<path class="leg rail" d="M364.0 467.8 C368.7 463.4 383.7 445.8 391.9 441.4 C400.1 436.9 407.8 439.6 413.1 441.2 C418.4 442.8 417.4 444.9 423.6 451.0 C429.7 457.2 442.7 473.3 450.2 478.0 C457.8 482.8 459.9 482.0 468.9 479.4 C477.9 476.8 493.7 466.8 504.2 462.5 C514.8 458.3 525.3 457.2 532.1 454.0 C538.9 450.9 537.1 447.4 544.9 443.7 C552.6 439.9 573.0 433.5 578.6 431.5"/>
+<circle class="stop" cx="636.0" cy="134.6" r="3.5"/>
+<circle class="stop" cx="425.5" cy="435.1" r="3.5"/>
+<circle class="stop" cx="434.7" cy="456.8" r="3.5"/>
+<circle class="stop" cx="383.4" cy="484.1" r="3.5"/>
+<circle class="pass" cx="577.9" cy="422.6" r="4.5"/>
+<circle class="pass" cx="423.6" cy="457.0" r="4.5"/>
+<circle class="stop" cx="602.0" cy="157.4" r="9"/>
+<text class="num" x="602.0" y="157.4">1</text>
+<circle class="stop" cx="626.0" cy="150.0" r="9"/>
+<text class="num" x="626.0" y="150.0">2</text>
+<circle class="stop" cx="652.0" cy="151.4" r="9"/>
+<text class="num" x="652.0" y="151.4">3</text>
+<circle class="ring" cx="523.5" cy="433.7" r="27"/>
+<circle class="stop wed" cx="523.5" cy="433.7" r="13.5"/>
+<text class="num" x="523.5" y="433.7" style="font-size:14px">4</text>
+<circle class="stop" cx="427.6" cy="418.1" r="9"/>
+<text class="num" x="427.6" y="418.1">5</text>
+<circle class="stop" cx="364.0" cy="467.8" r="9"/>
+<text class="num" x="364.0" y="467.8">6</text>
+<circle class="stop" cx="578.6" cy="431.5" r="9"/>
+<text class="num" x="578.6" y="431.5">7</text>
+<text class="lbl" x="588.0" y="162.4" text-anchor="end">Akita</text>
+<text class="lbl" x="610.0" y="132.0" text-anchor="end">Lake Tazawa</text>
+<text class="lbl" x="667.0" y="156.4" text-anchor="start">Morioka</text>
+<text class="lbl wed" x="523.5" y="401.7" text-anchor="middle">Fuji</text>
+<text class="lbl" x="415.6" y="406.1" text-anchor="end">Gujo-Hachiman</text>
+<text class="lbl" x="344.0" y="472.8" text-anchor="end">Kyoto</text>
+<text class="lbl" x="594.6" y="441.5" text-anchor="start">Tokyo</text>
+<text class="lbl sm" x="640.0" y="120.6" text-anchor="start">Dragon Eye</text>
+<text class="lbl sm" x="416.5" y="447.1" text-anchor="end">Seki</text>
+<path class="spur" style="stroke-dasharray:none;stroke-width:.8" d="M436.7 461.8 L452.7 504.8"/>
+<text class="lbl sm" x="454.7" y="516.8" text-anchor="start">Ghibli Park</text>
+<text class="lbl sm" x="383.4" y="506.1" text-anchor="middle">Iga</text>
+<g transform="translate(600 528)"><path class="leg" d="M0 0 H34"/><text class="cap2" x="44" y="4">By car</text><path class="leg rail" d="M0 22 H34"/><text class="cap2" x="44" y="26">By train</text><path class="spur" d="M0 44 H34"/><text class="cap2" x="44" y="48">Day trip</text></g>
+<text class="cap2" x="24" y="580">Route B · Wedding at Fuji, May 6 · Passes Tokyo twice</text>
+</svg>
+</figure>
+    <ol class="days">
+      <li><span class="d">May 2 to 4</span><span class="t"><span class="w">The north</span><p>Identical to Route A: arrive, the Dragon Eye on May 3, spare day on May 4.</p></span></li>
+      <li><span class="d">Wed May 5</span><span class="t"><span class="w">South to Fuji</span><p>Shinkansen to Tokyo, train to Kawaguchiko. Ryokan with private baths. Kimono fitting with a local dresser.</p></span></li>
+      <li><span class="d">Thu May 6<small>Wedding</small></span><span class="t"><span class="w">Ceremony at Kitaguchi Hongu Fuji Sengen Shrine</span><p>The shrine at the foot of the Yoshida trail, under Japan's largest wooden torii. Lakeside portraits after if Fuji is out.</p></span></li>
+      <li><span class="d">Fri May 7</span><span class="t"><span class="w">Fuji portraits, second chance</span><p>Dawn at Arakura Sengen and Oishi Park. Afternoon free.</p></span></li>
+      <li><span class="d">Sat May 8</span><span class="t"><span class="w">To Gujo-Hachiman</span><p>Train to Nagoya, car to Gujo. Canals, koi, a workshop.</p></span></li>
+      <li><span class="d">Sun May 9</span><span class="t"><span class="w">Ghibli day</span><p>Ghibli Park, with Okazaki candles on the way back.</p></span></li>
+      <li><span class="d">Mon May 10</span><span class="t"><span class="w">Seki swords, then Kyoto</span><p>Forge visit in Seki. Evening train to Kyoto.</p></span></li>
+      <li><span class="d">Tue May 11</span><span class="t"><span class="w">Kyoto</span><p>Fushimi Inari at dawn, Toei Kyoto Studio Park after.</p></span></li>
+      <li><span class="d">Wed May 12</span><span class="t"><span class="w">Ninja day in Iga</span><p>Back to Kyoto, evening shinkansen to Tokyo.</p></span></li>
+      <li><span class="d">Thu May 13</span><span class="t"><span class="w">Tattoo in Tokyo</span></span></li>
+      <li><span class="d">May 14 to 16</span><span class="t"><span class="w">MagicCon Tokyo</span></span></li>
+      <li><span class="d">Mon May 17</span><span class="t"><span class="w">Fly home from Haneda</span></span></li>
+    </ol>
+    <div class="gal one">
+      <figure class="ph wide" data-slot="routeB-1"><img src="images/fuji-shindo-wide.jpg" alt="Mt. Fuji and Lake Kawaguchi from Shindo Pass" loading="lazy"></figure>
+    </div>
+    <h4>What to weigh</h4>
+    <ul class="why">
+      <li>The wedding itself happens at Fuji, which is what you first pictured.</li>
+      <li>The ceremony date is tied to one place and one day of mountain weather. The ceremony happens inside the hall regardless, but the Fuji backdrop is a coin flip in early May.</li>
+      <li>The route passes through Tokyo twice, and the Fuji stay lands on the last Golden Week holiday, when ryokans cost the most.</li>
+      <li>This would be our first ceremony with this shrine. Yoshida Shrine in Route A is a team we already work with.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow fade">
+    <div class="eyebrow">A question for you</div>
+    <h2>How much of Tokyo do you want?</h2>
+    <div class="rule"></div>
+    <p>On both routes, Tokyo is the tattoo day plus MagicCon. There is almost no free Tokyo time for the three of you. That is a choice, not an accident: your list is almost entirely outside the city, and we built the trip around it.</p>
+    <p>If you want a slower Tokyo (Jackson at TeamLab, Akihabara, Nakano Broadway for Blaise, a day of nothing), the simplest trades are these:</p>
+    <ul class="dash">
+      <li>Drop the Hachimantai spare day and arrive in Tokyo a day earlier.</li>
+      <li>Fold the Seki forge into the Gujo day and give the saved day to Tokyo.</li>
+      <li>In Route A, do Fuji as a long day trip instead of a ryokan night, which frees a Tokyo night.</li>
+    </ul>
+    <p style="margin-top:1.4rem">Tell us on the call which way you lean and we cut the next version to match.</p>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade">
+    <div class="eyebrow">The ceremony</div>
+    <h2>Where you marry.</h2>
+    <div class="rule"></div>
+
+    <div class="reclabel"><span class="pill">Our recommendation</span><span class="loc">Yoshida Shrine, Kyoto</span></div>
+    <h3>A thousand-year-old shrine on a wooded hill</h3>
+    <div class="rule"></div>
+    <p>Yoshida Shrine was founded in 859 on Mt. Yoshida beside Kyoto University. Quiet, old, almost no tourists. The ceremony runs about 30 minutes: purification, the priest's prayer, the ring exchange, san-san-kudo with a non-alcoholic cup, the tamagushi offering. Everyone attends. Guests sit inside the hall with you.</p>
+    <h4>Why this works</h4>
+    <ul class="why">
+      <li>You asked for a real Shinto ceremony, not a performance of one. This is a working shrine with its own priests, and the ritual is the same one Japanese couples have here.</li>
+      <li>You asked for a red torii. There are torii on site for the portraits straight after.</li>
+      <li>Dinner follows at a ryotei, a traditional restaurant with private tatami rooms, with a kaiseki course and a non-alcoholic pairing.</li>
+      <li>Our Kyoto attire team handles dressing, hair and makeup, the photographer and the shrine arrangements. We have run this format twice already.</li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><span class="k">Date</span>Mon May 10</div>
+      <div class="stat"><span class="k">Ceremony</span>About 30 min</div>
+      <div class="stat"><span class="k">Guests</span>Everyone, inside the hall</div>
+      <div class="stat"><span class="k">After</span>Ryotei dinner</div>
+    </div>
+    <div class="gal">
+      <figure class="ph" data-slot="yoshida-1"><img src="images/yoshida-torii.jpg" alt="The great torii at Yoshida Shrine" loading="lazy"></figure>
+      <figure class="ph" data-slot="yoshida-2"><img src="images/yoshida-haiden.jpg" alt="Yoshida Shrine worship hall" loading="lazy"></figure>
+    </div>
+    <div class="links"><a href="https://www.yoshidajinja.com/" target="_blank" rel="noopener">Yoshida Shrine</a></div>
+
+    <div class="reclabel"><span class="pill">Alternative</span><span class="loc">Kitaguchi Hongu Fuji Sengen Shrine, Fujiyoshida</span></div>
+    <h3>The shrine at the foot of the mountain</h3>
+    <div class="rule"></div>
+    <p>Nineteen hundred years of history, part of the Mt. Fuji World Heritage listing, and the traditional start of the Yoshida climbing trail. Japan's largest wooden torii, a thousand-year-old sacred cedar, a "married couple" cypress, and a dragon-head water basin at the entrance. The ceremony happens in the hall, so it goes ahead whatever the weather. Fuji itself is seen from the lakeside, not from the shrine.</p>
+    <h4>What to weigh</h4>
+    <ul class="why">
+      <li>It is the Fuji wedding you first described, and the shrine is spectacular in its own right.</li>
+      <li>We would be arranging this shrine, a dresser and a photographer for the first time. Doable, but less proven than Kyoto.</li>
+    </ul>
+    <div class="stats">
+      <div class="stat"><span class="k">Date</span>Thu May 6</div>
+      <div class="stat"><span class="k">From Kawaguchiko</span>20 min by road</div>
+      <div class="stat"><span class="k">Fuji view</span>From the lake, not the shrine</div>
+    </div>
+    <div class="gal one">
+      <figure class="ph wide" data-slot="kitaguchi-1"><img src="images/kitaguchi.jpg" alt="Kitaguchi Hongu Fuji Sengen Shrine" loading="lazy" style="object-position:center 15%"></figure>
+    </div>
+    <div class="links"><a href="https://www.sengenjinja.jp/" target="_blank" rel="noopener">Kitaguchi Hongu</a></div>
+
+    <h4 style="margin-top:3.5rem">The Fuji portraits, on both routes</h4>
+    <ul class="why">
+      <li>Dawn at Arakura Fuji Sengen Shrine for the red pagoda and Fuji in one frame, then Oishi Park on the lake.</li>
+      <li>In kimono, with a local dresser and photographer. Cera's own kimono, since by then it is hers.</li>
+      <li>Two mornings, so one clouded day does not take the photo away. If Fuji hides both days, the pagoda and torii still make the picture, which was your own fallback.</li>
+    </ul>
+    <div class="gal">
+      <figure class="ph" data-slot="fuji-1"><img src="images/chureito.jpg" alt="Chureito Pagoda and Mt. Fuji" loading="lazy"></figure>
+      <figure class="ph" data-slot="fuji-2"><img src="images/brief-fuji.jpg" alt="Mt. Fuji from Lake Kawaguchi" loading="lazy"></figure>
+    </div>
+    <div class="links"><a href="https://www.arakurafujisengen.com/" target="_blank" rel="noopener">Arakura Sengen</a></div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow fade">
+    <div class="eyebrow">Attire</div>
+    <h2>What you wear.</h2>
+    <div class="rule"></div>
+    <ul class="dash">
+      <li>Cera: a white kimono (shiromuku, the traditional all-white bridal kimono) with dragon motifs, bought outright so it comes home with you. Our attire team sources it. A custom woven or embroidered dragon piece and a vintage piece sit at very different prices, and we bring both options with real numbers in Version 2.</li>
+      <li>Blaise: black montsuki hakama (formal crested kimono with pleated trousers) with red in the under-layers. No yellow.</li>
+      <li>Jackson: boy's hakama in the same family of colors.</li>
+      <li>Dressing (kitsuke), hair and makeup on the wedding morning by the attire team. A second dressing for the Fuji portrait morning.</li>
+      <li>In Route A the fitting happens in Kyoto on May 8, so the kimono is ready before anyone else sees it.</li>
+    </ul>
+    <div class="gal big">
+      <figure class="ph tall" data-slot="attire-1"><img src="images/wedding-meiji.jpg" alt="A Shinto wedding procession, bride in shiromuku and groom in montsuki hakama" loading="lazy"></figure>
+      <figure class="ph tall" data-slot="attire-2"><img src="images/hakama.webp" alt="Groom in black montsuki and striped hakama" loading="lazy" style="object-position:center 15%"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade">
+    <div class="eyebrow">Your list</div>
+    <h2>Every item, answered.</h2>
+    <div class="rule"></div>
+    <ul class="ans">
+      <li><div class="q">Dragon lake in northern Japan <span class="v">Yes</span></div><p>The <a href="https://www.japan.travel/en/articles-from-2020/hachimantai-dragon-eye/" target="_blank" rel="noopener">Hachimantai Dragon Eye</a>, a crater pond at 1,600 m whose spring snowmelt forms a ring like a dragon's eye. It opens in stages through May. In your window you will see the snowfield, the blue crescent forming at the edge, and the 27 km snow corridor road with walls up to 8 m. The full ring usually comes later in May, and we say this now so there are no surprises. We pair it with Lake Tazawa, 40 minutes away, Japan's deepest lake and home of the Tatsuko dragon legend. Taking lake water home is fine. It goes in a sealed bottle in checked luggage.</p></li>
+      <li><div class="q">The water city, Gujo-Hachiman <span class="v">Yes</span></div><p>Canals with koi running past the houses, the Sogi spring, the castle above the town. Hands-on: plastic food sample making (Gujo invented it) and a local indigo or textile workshop we are confirming. Two nights in a town ryokan.</p></li>
+      <li><div class="q">Ninjutsu class for Blaise <span class="v">Yes</span></div><p>Iga, the historic ninja homeland, a day trip from Kyoto. A program designed by the Japan Ninja Council on the site of a mountain castle used for real ninja training: breathing, hand signs and walking techniques in the dojo, then the forest for sword, grappling hook and concealment. We are also tracing where your Facebook video was filmed and will match it if we can.</p></li>
+      <li><div class="q">Tattoo in Tokyo <span class="v">Yes</span></div><p>May 13, after every onsen on the trip. <a href="https://threetidestattoo.com/" target="_blank" rel="noopener">Three Tides</a> is a solid choice. We are shortlisting two or three artists whose dragons match your sketch-style references, including one who works in color for the jade option. The deposit and design brief go in early, since the good artists book months out.</p></li>
+      <li><div class="q">Tattoo-friendly onsen <span class="v">Yes</span></div><p>Three chances before the tattoo: the Tazawa ryokan, the Gujo ryokan, and the Fuji ryokan with private open-air baths in the room, which makes the tattoo question irrelevant for the whole group.</p></li>
+      <li><div class="q">Indigo dyeing <span class="v">Yes</span></div><p>Gujo and the Hida region both have working indigo dyers. We are confirming a workshop where you dye your own piece on May 6.</p></li>
+      <li><div class="q">Making or buying a sword <span class="v">Yes</span></div><p><a href="https://visitseki.jp/" target="_blank" rel="noopener">Seki</a>, 30 minutes from Gujo, has made blades for 700 years. Two options: a private forging demonstration beside a working forge with English narration, or a full day where you forge a small blade or kitchen knife with a licensed swordsmith and take it home. Buying a real sword to export involves paperwork we will walk you through.</p></li>
+      <li><div class="q">Coin ring <span class="v cut">Swapped</span></div><p>Your instinct was right. It is the touristy one, and reshaping Japanese coins sits in a legal grey area. The forged knife in Seki is the better "make something and take it home".</p></li>
+      <li><div class="q">Traditional Japanese candles <span class="v">Yes</span></div><p>Near Okazaki Castle on the Ghibli Park route: watch the craftsmen make warosoku (plant-wax candles) the Edo way, then paint your own. The 240-year-old Mishima shop in Hida-Furukawa is the purist's option if you want the detour.</p></li>
+      <li><div class="q">Fushimi Inari <span class="v">Yes</span></div><p>Dawn on May 9. The gates are nearly empty before 7, and the walk up through the thousands of torii is the best hour of Kyoto.</p></li>
+      <li><div class="q">Koi history museum <span class="v cut">Cut, for now</span></div><p>It exists (Nishikigoi no Sato in Ojiya, Niigata) but it is a full day off every route. Gujo's canals give you the koi. If it matters more than we think, say so and we will price the detour.</p></li>
+      <li><div class="q">Power Rangers museum <span class="v cut">Answered differently</span></div><p>There is no permanent museum. Super Sentai, the original of Power Rangers, ended its 50-year run in February 2026. What exists: Toei Kyoto Studio Park, the studio that made it, with a permanent Super Sentai History exhibit, a location gallery and a live hero show (May 9). And a touring All Super Sentai Exhibition, 500 real props, suits and robots, which moves city to city. We are asking the organizer where it will be in May 2027. If it is anywhere on the route, the itinerary bends to it. Blaise may already know: Mighty Morphin was adapted from Kyoryu Sentai Zyuranger (1992).</p></li>
+      <li><div class="q">Studio Ghibli, a full day <span class="v">Upgraded</span></div><p>The Mitaka museum is a 2 to 3 hour visit and tickets are a lottery. <a href="https://ghibli-park.jp/en/" target="_blank" rel="noopener">Ghibli Park</a> in Aichi is the full day you asked for, with Satsuki and Mei's house, the Valley of Witches and Mononoke Village. It sits on the route between Gujo and Kyoto. Tickets release two months ahead and we book them the hour they open.</p></li>
+    </ul>
+    <div class="gal three big">
+      <figure class="ph" data-slot="list-1"><img src="images/nyuto.jpg" alt="Nyuto Onsen, Akita" loading="lazy"></figure>
+      <figure class="ph" data-slot="list-2"><img src="images/ghibli-park.jpg" alt="Ghibli Park, Aichi" loading="lazy"></figure>
+      <figure class="ph" data-slot="list-3"><img src="images/toei.jpg" alt="Toei Kyoto Studio Park" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap fade">
+    <div class="eyebrow">Look and feel</div>
+    <h2>The dragon, the mountain, the water.</h2>
+    <div class="rule"></div>
+    <div class="narrow" style="margin:0">
+      <p>Everything on your list is water, stone, snow or fire: a lake that forms a dragon's eye, canals full of koi, a forge, a volcano. The wedding should look like it belongs to that trip, not to a wedding catalogue. White silk and black silk against old timber and red lacquer, and nothing added that the shrine does not already have.</p>
+    </div>
+    <div class="lf">
+      <div><h3>Ceremony</h3><div class="rule"></div><p>Inside the hall, lit by what comes through the doors. No floral arrangements. The shrine's own red and the cedar around it do the work.</p></div>
+      <div><h3>Attire</h3><div class="rule"></div><p>Shiromuku white for Cera with the dragon worked into the weave. Black montsuki for Blaise with red at the collar and hem. Jackson in black and red to match. No yellow anywhere.</p></div>
+      <div><h3>Dinner</h3><div class="rule"></div><p>A private tatami room at a ryotei. Lacquer, ceramics, seasonal kaiseki, a non-alcoholic pairing poured with the same ceremony as sake.</p></div>
+      <div><h3>Portraits</h3><div class="rule"></div><p>Dawn light, the red pagoda and Fuji, then the lake. Two mornings so weather is never the whole story.</p></div>
+    </div>
+    <div class="sw">
+      <div><div class="c" style="background:#F3EEE4"></div><div class="n">Shiromuku</div><div class="x">#F3EEE4</div><div class="d">Cera's kimono, the white of the ceremony.</div></div>
+      <div><div class="c" style="background:#1A1A1A"></div><div class="n">Montsuki</div><div class="x">#1A1A1A</div><div class="d">Blaise and Jackson. Black silk, five crests.</div></div>
+      <div><div class="c" style="background:#B3261E"></div><div class="n">Shrine red</div><div class="x">#B3261E</div><div class="d">Torii, the collar under the black, the pagoda.</div></div>
+      <div><div class="c" style="background:#3E6B5A"></div><div class="n">Jade</div><div class="x">#3E6B5A</div><div class="d">The dragon. Tattoo reference, obi cord, a single accent.</div></div>
+      <div><div class="c" style="background:#5B7F8E"></div><div class="n">Dragon Eye blue</div><div class="x">#5B7F8E</div><div class="d">The snowmelt ring at Kagami-numa. Stationery, ribbon.</div></div>
+      <div><div class="c" style="background:#5C4A3C"></div><div class="n">Old cedar</div><div class="x">#5C4A3C</div><div class="d">Shrine timber, ryokan floors, the forge.</div></div>
+    </div>
+    <div class="gal three">
+      <figure class="ph tall" data-slot="lf-1"><img src="images/brief-dragoneye.jpg" alt="The Dragon Eye" loading="lazy"></figure>
+      <figure class="ph tall" data-slot="lf-2"><img src="images/yoshida-torii.jpg" alt="Yoshida Shrine torii" loading="lazy"></figure>
+      <figure class="ph tall" data-slot="lf-3"><img src="images/brief-fuji.jpg" alt="Mt. Fuji from Lake Kawaguchi" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="background:var(--paper-2)">
+  <div class="wrap narrow fade">
+    <div class="eyebrow">Paperwork</div>
+    <h2>Making it official.</h2>
+    <div class="rule"></div>
+    <ul class="dash">
+      <li>The Shinto ceremony is symbolic. Nothing about it creates a legal marriage, and that is normal here.</li>
+      <li>Cera is checking with Knox County whether a Tennessee license can be signed while abroad. Our understanding is that it cannot, but we want their answer.</li>
+      <li>If you want the legal date to match the ceremony date, the cleaner path is registering the marriage at a Japanese city office while you are here. It needs an affidavit from the US Embassy in Tokyo first, which we would fit into the trip. We confirm the exact steps before Version 2.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap fade">
+    <div class="eyebrow">Timing</div>
+    <h2>What gets booked, and when.</h2>
+    <div class="rule"></div>
+    <div class="tbl">
+    <table>
+      <tr><td>Golden Week ryokans (Tazawa, Gujo)</td><td>Now</td></tr>
+      <tr><td>Yoshida Shrine date and attire team</td><td>On signing</td></tr>
+      <tr><td>Tattoo artist deposit</td><td>December</td></tr>
+      <tr><td>Ghibli Park tickets</td><td>Early March</td></tr>
+      <tr><td>Shinkansen seats for May 5, the Golden Week return day</td><td>April 5</td></tr>
+      <tr><td>Seki forge, Iga ninja, workshops</td><td>60 days out</td></tr>
+      <tr><td>Super Sentai exhibition</td><td>When the venue is announced</td></tr>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade">
+    <div class="eyebrow">What we handle</div>
+    <h2>All of it, in two languages.</h2>
+    <div class="rule"></div>
+    <div class="narrow" style="margin:0">
+      <p>You said on the call that you were worried about doing the Americanized version of Japan by accident. That is the whole job. It is not translation. It is knowing which shrine will take a ceremony with a non-alcoholic cup and not blink, which ryokan on the Dragon Eye road has a room for three in Golden Week, which tattoo artist draws a Japanese dragon with the right number of toes, and how to ask for all of it so the answer is yes.</p>
+    </div>
+    <div class="cols2">
+      <div>
+        <h3>Before the trip</h3>
+        <div class="rule"></div>
+        <ul class="dash">
+          <li>Shrine, attire team and ryotei booked and briefed for the ceremony, including the non-alcoholic san-san-kudo</li>
+          <li>Sourcing Cera's dragon shiromuku for purchase, with options and real prices before she chooses</li>
+          <li>Blaise's and Jackson's hakama, fittings and dressing arranged</li>
+          <li>The full two-week route designed with you, then accommodation and travel booked with you</li>
+          <li>The Dragon Eye day planned with a weather spare, and the lake water question answered before you pack</li>
+          <li>Ghibli Park, Super Sentai and shinkansen tickets bought the hour they release</li>
+          <li>The tattoo artist shortlisted to your references, consultation arranged, deposit placed</li>
+          <li>Guest information for the seven joining in Kyoto: where to stay, how to get to the shrine, what to wear, what to expect</li>
+          <li>A WhatsApp group with you and our team for planning, monthly planning meetings that move to twice a month in the last four months, and extra meetings whenever you need them</li>
+        </ul>
+      </div>
+      <div>
+        <h3>On the ground</h3>
+        <div class="rule"></div>
+        <ul class="dash">
+          <li>With you from dressing to dinner on the wedding day, running the timeline so you never see it</li>
+          <li>Live translation between you and the shrine, the attire team and the restaurant</li>
+          <li>Every host on the route briefed before you arrive, so the ryokan knows it is three of you with a ten-year-old and a tattoo appointment on the 13th</li>
+          <li>A WhatsApp line to us for the whole trip, in English or Japanese, whenever you need it</li>
+          <li>Problem solving before you hear about it: a clouded Fuji morning, a fully booked onsen, a train that sells out</li>
+        </ul>
+      </div>
+    </div>
+    <div class="narrow" style="margin:0">
+      <h4 style="margin-top:3.5rem">What you handle</h4>
+      <p>Flights, the group's own travel and rooms, and the things you want to bring yourselves: rings, vows, anything for the shadow box. If you have a photographer you love, bring them. If not, we have people.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="background:var(--paper-2)">
+  <div class="wrap fade">
+    <div class="eyebrow">Investment</div>
+    <h2>What this costs.</h2>
+    <div class="rule"></div>
+    <div class="feebox" style="background:var(--paper)">
+      <span class="k">Planning fee</span>
+      <div class="fee">$8,000 USD</div>
+      <div class="split">
+        <div><span class="k">Wedding planning</span>$5,500</div>
+        <div><span class="k">Trip design</span>$2,500</div>
+      </div>
+      <p class="s">Full planning and coordination of the ceremony and dinner, and the design and booking of the two-week itinerary, in Japanese and English</p>
+    </div>
+    <p>Below is what Route A looks like against your working range of $20,000 to $25,000, with the planning fee sitting inside it rather than on top. The wedding covers all ten of you. The trip covers the three of you: Cera, Blaise and Jackson. Every line is built from a current vendor quote, a live Booking.com rate for your exact dates, or a published price, converted at ¥157 to the dollar. Where a line is our estimate rather than a quote, it says so. Version 2 replaces every estimate with a real number.</p>
+
+    <h4>The wedding, all ten of you</h4>
+    <p class="muted" style="font-size:.9rem">Built from the attire team's quote for our March 2027 wedding at the same shrine, in the same format. Only the dinner and the kimono change with your numbers.</p>
+    <div class="tbl">
+    <table>
+      <tr><td>Attire team "Aoi" plan: attendant, dressing for bride and groom, bride's hair and makeup, rehearsal, bridal taxi, shrine support fee. Quoted ¥275,000 incl. tax</td><td>$1,750</td></tr>
+      <tr><td>Yoshida Shrine ceremony offering (hatsuho-ryo), paid direct to the shrine. ¥100,000</td><td>$640</td></tr>
+      <tr><td>Ceremony and portrait photography with data delivery. Rate card ¥90,000</td><td>$575</td></tr>
+      <tr><td>Jackson's hakama rental and dressing. Estimate, ¥30,000</td><td>$190</td></tr>
+      <tr><td>Ryotei dinner for 10, kaiseki course, non-alcoholic pairing. ¥18,000 a head</td><td>$1,150</td></tr>
+      <tr><td>Fuji portrait morning: local dresser and photographer. Estimate, ¥120,000</td><td>$765</td></tr>
+      <tr><td><strong>Wedding subtotal</strong></td><td><strong>$5,070</strong></td></tr>
+    </table>
+    </div>
+    <p class="muted" style="font-size:.9rem;margin-top:1rem">This may change depending on the kimono you want. A pre-owned silk shiromuku runs about $100 to $560. A custom-made piece with your dragon design starts around $3,000 and is quoted to order. That purchase sits outside the wedding figure above.</p>
+
+    <h4>The trip, for the three of you</h4>
+    <div class="tbl">
+    <table>
+      <tr><td>Lake Tazawa, 3 nights over Golden Week (May 2–5), one room for two adults and a 10-year-old, two meals. Live Booking.com rates: Kamenoi Tazawako ¥187,000, Katakurinohana ¥299,000, Kashintei Shirahama ¥403,000</td><td>$1,200 to $2,550</td></tr>
+      <tr><td>Gujo-Hachiman, 3 nights (May 5–8). Miharaya Ryokan in the old town ¥61,000 room only, or a whole machiya house ¥125,000, with meals added where not included</td><td>$500 to $1,000</td></tr>
+      <tr><td>Kyoto, 3 nights (May 8–11). KABIN Taka ¥68,000, Luck You Kyoto machiya ¥104,000, Rinn Gion Shirakawa ¥130,000</td><td>$440 to $830</td></tr>
+      <tr><td>Kawaguchiko, 2 nights (May 11–13). Hotel Koryu ¥101,000, La Vista Fujikawaguchiko ¥181,000 with private-bath rooms, Fuji Onsenji Yumedono ¥369,000 with a private open-air bath in every room</td><td>$640 to $2,350</td></tr>
+      <tr><td>Tokyo, 4 nights (May 13–17), family room. Richmond Premier Oshiage ¥95,000, Asakusa Kokono Club ¥126,000, Candeo Roppongi ¥141,000</td><td>$600 to $900</td></tr>
+      <tr><td>Trains for three: Haneda to Akita air hop, Morioka to Nagoya, Nagoya to Kyoto, Kyoto to Mishima, Fuji to Tokyo. Published fares: Tokyo–Morioka ¥15,010, Tokyo–Nagoya ¥11,300, Nagoya–Kyoto ¥5,910. Jackson at child fare</td><td>$1,100 to $1,350</td></tr>
+      <tr><td>Private car and driver, 6 days (Tohoku 2, Gifu 3, Fuji 1). A chartered jumbo taxi runs ¥45,000 to ¥65,000 a day</td><td>$1,700 to $2,500</td></tr>
+      <tr><td>Seki forge: private demonstration for your group, ¥121,000 flat, or full-day forging at ¥51,100 a person for Cera and Blaise</td><td>$650 to $770</td></tr>
+      <tr><td>Iga ninja day: Nipponia Iga private ninjutsu training, ¥13,000 a person</td><td>$250</td></tr>
+      <tr><td>Gujo indigo dyeing, ¥15,000 a person, dye a shawl to take home</td><td>$290</td></tr>
+      <tr><td>Ghibli Park premium pass, weekday: adult ¥7,300, child ¥3,650</td><td>$115</td></tr>
+      <tr><td>Toei Kyoto Studio Park: adult ¥2,800, child ¥1,600, plus attraction passes</td><td>$75</td></tr>
+      <tr><td>Candle painting in Okazaki, food sample making in Gujo. Estimate</td><td>$100 to $160</td></tr>
+      <tr><td>Tattoo, 4 to 5 hour custom session. Three Tides prices by size: postcard-sized from ¥50,000; a calf-sized custom piece runs well above that</td><td>$500 to $1,100</td></tr>
+      <tr><td><strong>Trip subtotal</strong></td><td><strong>$8,200 to $14,200</strong></td></tr>
+    </table>
+    </div>
+
+    <h4>Everything, with the planning fee inside it</h4>
+    <div class="tbl">
+    <table>
+      <tr><td>Wedding, all ten</td><td>$5,070</td></tr>
+      <tr><td>Cera's kimono, your choice</td><td>$100 to $3,000+</td></tr>
+      <tr><td>Trip, the three of you, before flights</td><td>$8,200 to $14,200</td></tr>
+      <tr><td>Planning fee: wedding $5,500, trip design $2,500</td><td>$8,000</td></tr>
+      <tr style="border-top:2px solid var(--wine)"><td><strong>Estimated total</strong></td><td><strong>$21,400 to $30,300</strong></td></tr>
+    </table>
+    </div>
+
+    <div class="callout">
+      <p>Both halves land where you put them. The wedding is about $5,100, inside your $5,000 to $8,000, with your kimono on top as its own decision. The trip for three sits inside $10,000 to $15,000. The low end assumes mid-tier ryokans and a vintage kimono. The high end assumes the top ryokans at Tazawa and Fuji over Golden Week and a custom-made dragon shiromuku.</p>
+      <p>With the planning fee inside it, the low end lands inside your $20,000 to $25,000 and the high end runs past it. The ryokan tier at Tazawa and Fuji over Golden Week, and the kimono, are what decide which end you are at. Golden Week 2027 rooms are already on sale and the good ryokans will not get cheaper, so those two are held the week you sign. Scope is where we adjust if the number needs to move. We will tell you what any change costs before you make it, and we will never quietly downgrade something to protect a total.</p>
+      <p>Not in these figures: flights, Jackson's and the group's travel to and from the ceremony in Kyoto, and anything the other seven do on their own days. If some of the group want to join parts of the itinerary, we will price those days as add-ons.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band dark">
+  <div class="wrap fade center">
+    <div class="eyebrow">Next steps</div>
+    <h2>How this starts.</h2>
+    <div class="rule c"></div>
+    <div class="steps">
+      <div><div class="n">01</div><div class="h">Pick a route</div><p>On tonight's call: Route A or B, the Tokyo question, and which lake you pictured.</p></div>
+      <div><div class="n">02</div><div class="h">Version 2</div><p>Costed, with named ryokans, the kimono options and the tattoo shortlist.</p></div>
+      <div><div class="n">03</div><div class="h">Sign and lock</div><p>We hold May 10 and the Golden Week rooms the same week you sign. A 50% deposit of the planning fee is needed to get started.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="wrap">
+    <h2>We would love to build this with you.</h2>
+    <p>This is a first draft on purpose. Nothing here is fixed except the dates of MagicCon. Tell us what is right, what is wrong, and what we missed, and the next version gets closer.</p>
+    <p class="sig">Juri + Eamon, Married in Japan</p>
+    <p class="v">Version 1 · November 2026</p>
+  </div>
+</section>
+
+<section class="band" style="padding-block:2rem">
+  <div class="wrap"><p class="credits">Photography via Wikimedia Commons: Mt. Fuji and Lake Kawaguchi (CC BY-SA 4.0); Hachimantai Dragon Eye by SQUAREZERO / FIND47 (CC BY 4.0); Fushimi Inari torii path (CC BY 2.0); Yoshida Shrine (CC0); Arakurayama Sengen Park (CC BY-SA 4.0); Meiji Jingu wedding (CC BY-SA 2.0); Nyuto Onsen (CC0); Ghibli Park (CC0); Toei Kyoto Studio Park (CC BY-SA 4.0); Kitaguchi Hongu Fuji Sengen Shrine by 江戸村のとくぞう (CC BY-SA 4.0).</p></div>
+</section>
+
+<script>
+(function(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  document.documentElement.classList.add('js');
+  var els=[].slice.call(document.querySelectorAll('.fade'));
+  els.forEach(function(e){ if (e.getBoundingClientRect().top > innerHeight) e.classList.add('pre'); });
+  var io=new IntersectionObserver(function(entries){ entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.remove('pre'); io.unobserve(en.target); } }); },{rootMargin:'0px 0px -6% 0px'});
+  els.forEach(function(e){ io.observe(e); });
+})();
+</script>
